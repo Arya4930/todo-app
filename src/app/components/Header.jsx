@@ -2,14 +2,11 @@
 
 import Image from 'next/image';
 import { signOut, useSession } from 'next-auth/react';
-import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { signIn } from 'next-auth/react';
 
 export default function HeaderNav() {
     const { data: session, status } = useSession();
-    const pathname = usePathname();
-
     const [open, setOpen] = useState(false);
 
     useEffect(() => {
@@ -20,26 +17,6 @@ export default function HeaderNav() {
             }
         }
     }, [status]);
-
-    useEffect(() => {
-        if (!isAnimating) return;
-        const overlay = document.getElementById('transition-overlay');
-        if (overlay) overlay.classList.remove('active');
-
-        const timeout = setTimeout(() => {
-        }, 400);
-
-        return () => clearTimeout(timeout);
-    }, [pathname]);
-
-    useEffect(() => {
-        const handleResize = () => {
-            if (window.innerWidth >= 640) setMenuOpen(false);
-        };
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
     return (
         <div className="mx-auto max-w-screen-2xl px-2 sm:px-4 bg-white dark:bg-black Manu-font transition-colors duration-300">
             <div className="flex items-center justify-between min-h-12 sm:min-h-16 text-black dark:text-white transition-colors duration-300">
