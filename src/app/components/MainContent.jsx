@@ -8,6 +8,8 @@ import {
     closestCenter,
     KeyboardSensor,
     PointerSensor,
+    MouseSensor,
+    TouchSensor,
     useSensor,
     useSensors,
 } from '@dnd-kit/core';
@@ -18,10 +20,13 @@ import {
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import Column from "./Stuff/Column";
+import { DragOverlay } from "@dnd-kit/core";
+import Card from "./Stuff/Card";
 
 export default function MainContent() {
     const [tasks, setTasks] = useState({ todo: [], inProgress: [], done: [] });
     const [newTask, setNewTask] = useState('');
+    const [activeId, setActiveId] = useState(null);
 
     useEffect(() => {
         const savedTasks = localStorage.getItem("tasks");
@@ -35,6 +40,7 @@ export default function MainContent() {
     }, [tasks])
 
     const addNewTask = () => {
+        if (!newTask.trim()) return;
         const task = {
             id: uuidv4(),
             text: newTask,
@@ -53,8 +59,13 @@ export default function MainContent() {
         }));
     }
 
+    const handleDragStart = ({ active }) => {
+        setActiveId(active.id);
+    };
+
     const handleDragEnd = ({ active, over }) => {
         if (!over) return;
+        setActiveId(null);
 
         const sourceCat = Object.keys(tasks).find(key => tasks[key].some(task => task.id === active.id));
         let destinationCat = Object.keys(tasks).find(key => tasks[key].some(task => task.id === over.id));
@@ -94,15 +105,24 @@ export default function MainContent() {
     };
 
     const sensors = useSensors(
-        useSensor(PointerSensor, {
+        useSensor(MouseSensor, {
             activationConstraint: {
-                distance: 5,    
+                distance: 10,
+            },
+        }),
+        useSensor(TouchSensor, {
+            activationConstraint: {
+                delay: 250,
+                tolerance: 5,
             },
         }),
         useSensor(KeyboardSensor, {
-            coordinateGetter: sortableKeyboardCoordinates
+            coordinateGetter: sortableKeyboardCoordinates,
         })
     );
+
+    const activeTask =
+        Object.values(tasks).flat().find(task => task.id === activeId) || null;
 
     return (
         <div className="mb-40 mx-4">
@@ -122,18 +142,23 @@ export default function MainContent() {
                     Add Task
                 </button>
             </div>
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
                 <div className="grid grid-cols-3 gap-4">
                     <SortableContext key={"todo"} items={tasks["todo"].map((task) => task.id)} strategy={verticalListSortingStrategy}>
-                        <Column tasks={tasks} type="todo" onDelete={deleteTask} />
+                        <Column tasks={tasks} type="todo" onDelete={deleteTask} activeId={activeId} />
                     </SortableContext>
                     <SortableContext key={"inProgress"} items={tasks["inProgress"].map((task) => task.id)} strategy={verticalListSortingStrategy}>
-                        <Column tasks={tasks} type="inProgress" onDelete={deleteTask} />
+                        <Column tasks={tasks} type="inProgress" onDelete={deleteTask} activeId={activeId} />
                     </SortableContext>
                     <SortableContext key={"done"} items={tasks["done"].map((task) => task.id)} strategy={verticalListSortingStrategy}>
                         <Column tasks={tasks} type="done" onDelete={deleteTask} />
                     </SortableContext>
                 </div>
+                <DragOverlay>
+                    {activeTask ? (
+                        <Card task={activeTask} onDelete={deleteTask} type="" />
+                    ) : null}
+                </DragOverlay>
             </DndContext>
         </div>
     )
