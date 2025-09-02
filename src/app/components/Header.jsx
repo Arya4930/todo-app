@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { signOut, useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { signIn } from 'next-auth/react';
 
 export default function HeaderNav() {
     const { data: session, status } = useSession();
@@ -66,7 +67,7 @@ export default function HeaderNav() {
                         <div key="profile" className="relative flex items-center gap-2 lg:gap-4 py-2 rounded-lg">
                             <button
                                 onClick={() => setOpen(!open)}
-                                className="flex items-center gap-1 lg:gap-2 px-3 lg:px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white transition"
+                                className="flex items-center gap-1 lg:gap-2 px-3 lg:px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white transition hover:cursor-pointer"
                             >
                                 <div className="w-6 h-6 lg:w-8 lg:h-8 relative rounded-full overflow-hidden">
                                     <Image
@@ -79,15 +80,9 @@ export default function HeaderNav() {
                                         className="object-cover"
                                     />
                                 </div>
-
-                                <div className="flex items-center gap-1 lg:gap-2 max-w-[80px] lg:max-w-[120px] truncate">
-                                    <span className="font-medium text-sm lg:text-base truncate hover:cursor-pointer">
-                                        {session.user?.name || 'User'}
-                                    </span>
-                                </div>
                             </button>
                             {open && (
-                                <div className="absolute right-0 mt-64 lg:mt-80 w-44 lg:w-52 bg-white dark:bg-slate-800 text-black dark:text-white rounded-lg shadow-lg z-50 py-2">
+                                <div className="absolute right-0 mt-30 w-44 bg-slate-800 text-white rounded-lg shadow-lg z-50 py-2">
                                     <button
                                         onClick={() =>
                                             signOut({ callbackUrl: '/' })
@@ -113,18 +108,18 @@ export default function HeaderNav() {
                             key="auth"
                             className="flex gap-2 lg:gap-4"
                         >
-                            <Link
-                                href="/auth/signup"
+                            <button
+                                onClick={() => signIn('google', { callbackUrl: '/' })}
                                 className="px-3 lg:px-6 py-2 rounded-2xl text-sm lg:text-xl font-semibold bg-blue-600 hover:bg-blue-700 text-white"
                             >
                                 Sign Up
-                            </Link>
-                            <Link
-                                href="/auth/signin"
+                            </button>
+                            <button
+                                onClick={() => signIn('google', { callbackUrl: '/' })}
                                 className="px-3 lg:px-6 py-2 rounded-2xl text-sm lg:text-xl font-semibold bg-yellow-400 hover:bg-yellow-500 text-white"
                             >
                                 Sign In
-                            </Link>
+                            </button>
                         </div>
                     )}
                 </div>

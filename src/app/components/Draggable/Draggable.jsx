@@ -9,7 +9,8 @@ export default function Draggable(props) {
     const style = {
         // Outputs `translate3d(x, y, 0)`
         transform: CSS.Translate.toString(transform),
-        width: '100%'
+        width: '100%',
+        height: '100%'
     };
 
     return (

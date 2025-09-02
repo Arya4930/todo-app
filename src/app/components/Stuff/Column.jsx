@@ -1,5 +1,5 @@
 import Card from "./Card";
-import Droppable from "../Droppable";
+import Droppable from "../Draggable/Droppable";
 
 export default function Column({ tasks, type, onDelete }) {
     return (

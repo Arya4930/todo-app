@@ -1,9 +1,22 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Plus} from "lucide-react";
+import { Plus } from "lucide-react";
 import { v4 as uuidv4 } from 'uuid';
-import { DndContext } from "@dnd-kit/core";
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+} from '@dnd-kit/core';
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 import Column from "./Stuff/Column";
 
 export default function MainContent() {
@@ -11,15 +24,14 @@ export default function MainContent() {
     const [newTask, setNewTask] = useState('');
 
     useEffect(() => {
-        const savedTasks = localStorage.getItem("todo");
+        const savedTasks = localStorage.getItem("tasks");
         if (savedTasks) {
             setTasks(JSON.parse(savedTasks));
-            console.log(JSON.parse(savedTasks))
         }
     }, [])
 
     useEffect(() => {
-        localStorage.setItem("todo", JSON.stringify(tasks));
+        localStorage.setItem("tasks", JSON.stringify(tasks));
     }, [tasks])
 
     const addNewTask = () => {
@@ -45,20 +57,55 @@ export default function MainContent() {
         if (!over) return;
 
         const sourceCat = Object.keys(tasks).find(key => tasks[key].some(task => task.id === active.id));
-        const destination = over.id;
-        if (sourceCat !== destination) {
+        let destinationCat = Object.keys(tasks).find(key => tasks[key].some(task => task.id === over.id));
+
+        if (!destinationCat && Object.keys(tasks).includes(over.id)) {
+            destinationCat = over.id;
+        }
+
+        if (!sourceCat || !destinationCat) return;
+
+        if (sourceCat === destinationCat) {
+            const sourceTasks = [...tasks[sourceCat]];
+            const oldIdx = sourceTasks.findIndex(task => task.id === active.id);
+            const newIdx = over.id === destinationCat ? sourceTasks.length : sourceTasks.findIndex(task => task.id === over.id);
+
+            if (oldIdx !== newIdx && newIdx !== -1) {
+                setTasks(prev => ({
+                    ...prev,
+                    [sourceCat]: arrayMove(prev[sourceCat], oldIdx, newIdx),
+                }));
+            }
+        } else {
             const task = tasks[sourceCat].find(task => task.id === active.id);
+            const destinationTasks = [...tasks[destinationCat]];
+            const newIdx = over.id === destinationCat ? destinationTasks.length : destinationTasks.findIndex(task => task.id === over.id);
+
             setTasks(prev => ({
                 ...prev,
                 [sourceCat]: prev[sourceCat].filter(task => task.id !== active.id),
-                [destination]: [...prev[destination], task]
+                [destinationCat]: newIdx === -1 ? [...prev[destinationCat], task] : [
+                    ...prev[destinationCat].slice(0, newIdx),
+                    task,
+                    ...prev[destinationCat].slice(newIdx)
+                ]
             }));
         }
-    }
+    };
+
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 5,    
+            },
+        }),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates
+        })
+    );
 
     return (
         <div className="mb-40 mx-4">
-            <DndContext onDragEnd={handleDragEnd}>
             <div className="flex space-x-4">
                 <input
                     type="text"
@@ -75,10 +122,17 @@ export default function MainContent() {
                     Add Task
                 </button>
             </div>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                 <div className="grid grid-cols-3 gap-4">
-                    <Column tasks={tasks} type="todo" onDelete={deleteTask} />
-                    <Column tasks={tasks} type="inProgress" onDelete={deleteTask} />
-                    <Column tasks={tasks} type="done" onDelete={deleteTask} />
+                    <SortableContext key={"todo"} items={tasks["todo"].map((task) => task.id)} strategy={verticalListSortingStrategy}>
+                        <Column tasks={tasks} type="todo" onDelete={deleteTask} />
+                    </SortableContext>
+                    <SortableContext key={"inProgress"} items={tasks["inProgress"].map((task) => task.id)} strategy={verticalListSortingStrategy}>
+                        <Column tasks={tasks} type="inProgress" onDelete={deleteTask} />
+                    </SortableContext>
+                    <SortableContext key={"done"} items={tasks["done"].map((task) => task.id)} strategy={verticalListSortingStrategy}>
+                        <Column tasks={tasks} type="done" onDelete={deleteTask} />
+                    </SortableContext>
                 </div>
             </DndContext>
         </div>
