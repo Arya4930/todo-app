@@ -7,7 +7,6 @@ import {
     DndContext,
     closestCenter,
     KeyboardSensor,
-    PointerSensor,
     MouseSensor,
     TouchSensor,
     useSensor,
@@ -19,9 +18,9 @@ import {
     sortableKeyboardCoordinates,
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import Column from "./Stuff/Column";
+import Column from "./Draggable/Column";
 import { DragOverlay } from "@dnd-kit/core";
-import Card from "./Stuff/Card";
+import Card from "./Draggable/Card";
 
 export default function MainContent() {
     const [tasks, setTasks] = useState({ todo: [], inProgress: [], done: [] });
@@ -58,6 +57,15 @@ export default function MainContent() {
             [category]: prevTasks[category].filter(task => task.id !== id)
         }));
     }
+
+    const handleEdit = (id, category, newText) => {
+        setTasks(prev => ({
+            ...prev,
+            [category]: prev[category].map(task =>
+                task.id === id ? { ...task, text: newText } : task
+            )
+        }));
+    };
 
     const handleDragStart = ({ active }) => {
         setActiveId(active.id);
@@ -143,10 +151,10 @@ export default function MainContent() {
                 </button>
             </div>
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
-                <div className="grid grid-cols-3 gap-4 md:grid-rows-3">
+                <div className="grid grid-rows-3 lg:grid-cols-3 gap-4">
                     {["todo", "inProgress", "done"].map((type) => (
                         <SortableContext key={type} items={tasks[type].map((task) => task.id)} strategy={verticalListSortingStrategy}>
-                            <Column tasks={tasks} type={type} onDelete={deleteTask} activeId={activeId} />
+                            <Column tasks={tasks} type={type} onDelete={deleteTask} activeId={activeId} handleEdit={handleEdit} />
                         </SortableContext>
                     ))}
                 </div>
