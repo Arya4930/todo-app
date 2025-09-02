@@ -143,16 +143,12 @@ export default function MainContent() {
                 </button>
             </div>
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
-                <div className="grid grid-cols-3 gap-4">
-                    <SortableContext key={"todo"} items={tasks["todo"].map((task) => task.id)} strategy={verticalListSortingStrategy}>
-                        <Column tasks={tasks} type="todo" onDelete={deleteTask} activeId={activeId} />
-                    </SortableContext>
-                    <SortableContext key={"inProgress"} items={tasks["inProgress"].map((task) => task.id)} strategy={verticalListSortingStrategy}>
-                        <Column tasks={tasks} type="inProgress" onDelete={deleteTask} activeId={activeId} />
-                    </SortableContext>
-                    <SortableContext key={"done"} items={tasks["done"].map((task) => task.id)} strategy={verticalListSortingStrategy}>
-                        <Column tasks={tasks} type="done" onDelete={deleteTask} />
-                    </SortableContext>
+                <div className="grid grid-cols-3 gap-4 md:grid-rows-3">
+                    {["todo", "inProgress", "done"].map((type) => (
+                        <SortableContext key={type} items={tasks[type].map((task) => task.id)} strategy={verticalListSortingStrategy}>
+                            <Column tasks={tasks} type={type} onDelete={deleteTask} activeId={activeId} />
+                        </SortableContext>
+                    ))}
                 </div>
                 <DragOverlay>
                     {activeTask ? (
