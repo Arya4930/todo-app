@@ -4,14 +4,15 @@ import Image from 'next/image';
 import { signOut, useSession } from 'next-auth/react';
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
+import DarkModeButton from './DarkModeButton';
 
 export default function HeaderNav() {
     const { data: session, status } = useSession();
     const [open, setOpen] = useState(false);
 
     return (
-        <div className="max-w-screen-4xl px-4 bg-black Manu-font transition-colors duration-300">
-            <div className="flex items-center justify-between min-h-16 text-white transition-colors duration-300">
+        <div className="text-black dark:text-white transition-colors duration-300">
+            <div className="flex items-center justify-between min-h-16 text-black dark:text-white transition-colors duration-300 mx-3">
                 <div className="flex items-center space-x-4 cursor-pointer">
                     <Image
                         src="/logo.png"
@@ -44,7 +45,7 @@ export default function HeaderNav() {
                             {open && (
                                 <div className="absolute right-0 mt-30 w-44 bg-slate-800 text-white rounded-lg shadow-lg z-50 py-2">
                                     <button onClick={() => signOut({ callbackUrl: '/' })}
-                                        className="block w-full text-left px-4 py-2 text-base hover:bg-gray-200 hover:cursor-pointer"
+                                        className="block w-full text-left px-4 py-2 text-base hover:bg-slate-500 hover:cursor-pointer"
                                     >
                                         Sign Out
                                     </button>
@@ -62,6 +63,7 @@ export default function HeaderNav() {
                             </button>
                         </div>
                     )}
+                    <DarkModeButton />
                 </div>
             </div >
         </div >

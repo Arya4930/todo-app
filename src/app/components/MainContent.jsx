@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Plus } from "lucide-react";
+import { Plus, SaveIcon } from "lucide-react";
 import { v4 as uuidv4 } from 'uuid';
 import {
     DndContext,
@@ -11,6 +11,7 @@ import {
     TouchSensor,
     useSensor,
     useSensors,
+    DragOverlay
 } from '@dnd-kit/core';
 import {
     arrayMove,
@@ -19,24 +20,41 @@ import {
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import Column from "./Draggable/Column";
-import { DragOverlay } from "@dnd-kit/core";
 import Card from "./Draggable/Card";
 
 export default function MainContent() {
     const [tasks, setTasks] = useState({ todo: [], inProgress: [], done: [] });
     const [newTask, setNewTask] = useState('');
     const [activeId, setActiveId] = useState(null);
+    const [message, setMessage] = useState('');
 
     useEffect(() => {
-        const savedTasks = localStorage.getItem("tasks");
-        if (savedTasks) {
-            setTasks(JSON.parse(savedTasks));
+        const load = async () => {
+            try {
+                setMessage("loading...")
+                const res = await fetch('api/tasks', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                if (!res.ok) throw new Error("Failed to load tasks");
+                const data = await res.json();
+                setTasks(data.tasks);
+                setMessage('Loaded Successfully');
+            } catch (error) {
+                console.error("Error loading tasks:", error);
+            }
         }
+        load();
     }, [])
 
     useEffect(() => {
-        localStorage.setItem("tasks", JSON.stringify(tasks));
-    }, [tasks])
+        const interval = setInterval(() => {
+            handleSaveTask();
+        }, 30000);
+        return () => clearInterval(interval);
+    }, []);
 
     const addNewTask = () => {
         if (!newTask.trim()) return;
@@ -46,7 +64,7 @@ export default function MainContent() {
         }
         setTasks(prevTasks => ({
             ...prevTasks,
-            todo: [...prevTasks.todo, task]
+            todo: [...(prevTasks.todo || []), task]
         }));
         setNewTask('');
     }
@@ -66,6 +84,23 @@ export default function MainContent() {
             )
         }));
     };
+
+    const handleSaveTask = async () => {
+        try {
+            setMessage("Saving...")
+            const res = await fetch("/api/tasks", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ tasks })
+            })
+            if (!res.ok) throw new Error("Failed to save tasks")
+            setMessage('Saved successfully');
+        } catch (error) {
+            console.error("Error saving tasks:", error);
+        }
+    }
 
     const handleDragStart = ({ active }) => {
         setActiveId(active.id);
@@ -133,29 +168,52 @@ export default function MainContent() {
         Object.values(tasks).flat().find(task => task.id === activeId) || null;
 
     return (
-        <div className="mb-40 mx-4">
+        <div className="mb-50 mx-4">
             <div className="flex space-x-4">
                 <input
                     type="text"
                     value={newTask}
                     onChange={e => setNewTask(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            e.preventDefault();
+                            addNewTask();
+                        }
+                    }}
                     placeholder="Add new Task"
                     className="flex-1 p-4 rounded-lg m-4 border border-gray-2"
                 />
                 <button
                     onClick={addNewTask}
-                    className="bg-green-500 hover:bg-green-600 text-white px-6 py-4 rounded-lg m-4 hover:cursor-pointer flex items-center"
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-4 rounded-lg my-3 hover:cursor-pointer flex items-center"
                 >
                     <Plus className="mr-2" />
                     Add Task
                 </button>
+                <div>
+                    <button
+                        onClick={handleSaveTask}
+                        className="bg-green-500 hover:bg-green-600 text-white px-10 py-4 rounded-lg mt-3 hover:cursor-pointer flex items-center"
+                    >
+                        <SaveIcon className="mr-2" />
+                        Save List
+                    </button>
+
+                    {message && (
+                        <span className={`text-white px-6 py-4 rounded-lg text-sm font-medium transition-all duration-300 items-center`}>
+                            {message}
+                        </span>
+                    )}
+                </div>
             </div>
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
-                <div className="grid grid-rows-3 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-fit">
                     {["todo", "inProgress", "done"].map((type) => (
-                        <SortableContext key={type} items={tasks[type].map((task) => task.id)} strategy={verticalListSortingStrategy}>
-                            <Column tasks={tasks} type={type} onDelete={deleteTask} activeId={activeId} handleEdit={handleEdit} />
-                        </SortableContext>
+                        tasks && tasks[type] && (
+                            <SortableContext key={type} items={tasks[type].map((task) => task.id)} strategy={verticalListSortingStrategy}>
+                                <Column tasks={tasks} type={type} onDelete={deleteTask} activeId={activeId} handleEdit={handleEdit} />
+                            </SortableContext>
+                        )
                     ))}
                 </div>
                 <DragOverlay>
