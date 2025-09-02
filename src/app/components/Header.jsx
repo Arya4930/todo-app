@@ -1,6 +1,5 @@
 "use client";
 
-import Link from 'next/link';
 import Image from 'next/image';
 import { signOut, useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
@@ -12,14 +11,11 @@ export default function HeaderNav() {
     const pathname = usePathname();
 
     const [open, setOpen] = useState(false);
-    const [isAnimating, setIsAnimating] = useState(false);
-    const [menuOpen, setMenuOpen] = useState(false);
 
     useEffect(() => {
         if (status === 'authenticated') {
             const firstLogin = localStorage.getItem('firstLoginDone');
             if (!firstLogin) {
-                setShowTooltip(true);
                 localStorage.setItem('firstLoginDone', 'true');
             }
         }
@@ -31,8 +27,6 @@ export default function HeaderNav() {
         if (overlay) overlay.classList.remove('active');
 
         const timeout = setTimeout(() => {
-            setIsAnimating(false);
-            setCurrentAnimation(null);
         }, 400);
 
         return () => clearTimeout(timeout);
@@ -69,7 +63,7 @@ export default function HeaderNav() {
                                 onClick={() => setOpen(!open)}
                                 className="flex items-center gap-1 lg:gap-2 px-3 lg:px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white transition hover:cursor-pointer"
                             >
-                                <div className="w-6 h-6 lg:w-8 lg:h-8 relative rounded-full overflow-hidden">
+                                <div className="w-6 h-6">
                                     <Image
                                         src={
                                             session.user?.image ||
