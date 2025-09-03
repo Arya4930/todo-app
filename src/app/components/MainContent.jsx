@@ -22,7 +22,7 @@ import {
 import Column from "./Draggable/Column";
 import Card from "./Draggable/Card";
 
-export default function MainContent() {
+export default function MainContent({ darkMode }) {
     const [tasks, setTasks] = useState({ todo: [], inProgress: [], done: [] });
     const [newTask, setNewTask] = useState('');
     const [activeId, setActiveId] = useState(null);
@@ -168,7 +168,7 @@ export default function MainContent() {
         Object.values(tasks).flat().find(task => task.id === activeId) || null;
 
     return (
-        <div className="mb-50 mx-4">
+        <div className="mb-50 mx-4 ">
             <div className="flex space-x-4">
                 <input
                     type="text"

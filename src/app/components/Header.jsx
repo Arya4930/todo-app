@@ -14,6 +14,7 @@ export default function HeaderNav() {
         <div className="text-black dark:text-white transition-colors duration-300">
             <div className="flex items-center justify-between min-h-16 text-black dark:text-white transition-colors duration-300 mx-3">
                 <div className="flex items-center space-x-4 cursor-pointer">
+                    
                     <Image
                         src="/logo.png"
                         alt="Logo"
@@ -63,7 +64,7 @@ export default function HeaderNav() {
                             </button>
                         </div>
                     )}
-                    <DarkModeButton />
+                    {/* <DarkModeButton /> */}
                 </div>
             </div >
         </div >

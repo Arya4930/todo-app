@@ -1,15 +1,21 @@
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Geist, Geist_Mono, Roboto } from 'next/font/google';
 import { Provider } from './provider';
 import './globals.css';
 
 const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin']
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const roboto = Roboto({
+  variable: '--font-roboto',
+  subsets: ['latin'],
+  weight: ['400', '700'],
 });
 
 const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin']
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
 });
 
 export const metadata = {
@@ -42,12 +48,14 @@ export function generateThemeScript() {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning className="manu-font">
+    <html lang="en">
       <head>
         <script dangerouslySetInnerHTML={{ __html: generateThemeScript()}}/>
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          <Provider>{children}</Provider>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} ${roboto.variable} antialiased`}
+      >
+        <Provider>{children}</Provider>
       </body>
     </html>
   );
