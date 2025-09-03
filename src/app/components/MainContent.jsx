@@ -27,6 +27,7 @@ export default function MainContent({ darkMode }) {
     const [newTask, setNewTask] = useState('');
     const [activeId, setActiveId] = useState(null);
     const [message, setMessage] = useState('');
+    const [loadingTasks, setIsloadingTasks] = useState(true)
 
     useEffect(() => {
         const load = async () => {
@@ -42,6 +43,7 @@ export default function MainContent({ darkMode }) {
                 const data = await res.json();
                 setTasks(data.tasks);
                 setMessage('Loaded Successfully');
+                setIsloadingTasks(false);
             } catch (error) {
                 console.error("Error loading tasks:", error);
             }
@@ -50,6 +52,7 @@ export default function MainContent({ darkMode }) {
     }, [])
 
     useEffect(() => {
+        if(loadingTasks) return;
         const interval = setInterval(() => {
             handleSaveTask();
         }, 30000);
@@ -185,7 +188,7 @@ export default function MainContent({ darkMode }) {
                 />
                 <button
                     onClick={addNewTask}
-                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-4 rounded-lg my-3 hover:cursor-pointer flex items-center"
+                    className="bg-yellow-500 hover:bg-yellow-600 px-6 py-4 rounded-lg my-3 hover:cursor-pointer flex items-center"
                 >
                     <Plus className="mr-2" />
                     Add Task
@@ -193,14 +196,14 @@ export default function MainContent({ darkMode }) {
                 <div>
                     <button
                         onClick={handleSaveTask}
-                        className="bg-green-500 hover:bg-green-600 text-white px-10 py-4 rounded-lg mt-3 hover:cursor-pointer flex items-center"
+                        className="bg-green-500 hover:bg-green-600 px-10 py-4 rounded-lg mt-3 hover:cursor-pointer flex items-center"
                     >
                         <SaveIcon className="mr-2" />
                         Save List
                     </button>
 
                     {message && (
-                        <span className={`text-white px-6 py-4 rounded-lg text-sm font-medium transition-all duration-300 items-center`}>
+                        <span className={`px-6 py-4 rounded-lg text-sm font-medium transition-all duration-300 items-center`}>
                             {message}
                         </span>
                     )}

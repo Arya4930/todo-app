@@ -1,47 +1,30 @@
 "use client"
 
-import { useState, useEffect } from 'react';
 import { Sun, Moon } from 'lucide-react'
+import { useState, useEffect } from 'react';
+import { useTheme } from 'next-themes';
 
 export default function DarkModeButton() {
-    const [isDark, setIsDark] = useState(false);
+    const [mounted, setMounted] = useState(false)
+    const { theme, setTheme } = useTheme()
+
+    theme === 'system' ? systemTheme : theme;
 
     useEffect(() => {
-        const root = document.documentElement;
-        const theme = localStorage.getItem('hs_theme');
+        setMounted(true)
+    }, [])
 
-        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-        if (theme === 'dark' || (theme === 'auto' && systemPrefersDark)) {
-            root.classList.add('dark');
-            setIsDark(true);
-        } else {
-            root.classList.remove('dark');
-            setIsDark(false);
-        }
-    }, []);
-
-    const toggleTheme = () => {
-        const root = document.documentElement;
-
-        if (isDark) {
-            root.classList.remove('dark');
-            localStorage.setItem('hs_theme', 'light');
-            setIsDark(false);
-        } else {
-            root.classList.add('dark');
-            localStorage.setItem('hs_theme', 'dark');
-            setIsDark(true);
-        }
-    };
+    if (!mounted) {
+        return null
+    }
 
     return (
         <button
-            onClick={toggleTheme}
+            onClick={() => theme == "dark" ? setTheme('light') : setTheme("dark")}
             className="rounded-full p-2 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors hover:cursor-pointer"
             aria-label="Toggle dark mode"
         >
-            {isDark ? <Sun size={20} /> : <Moon size={20} />}
+            {theme == "dark" ? <Sun size={20} /> : <Moon size={20} />}
         </button>
     )
 }

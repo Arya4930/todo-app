@@ -47,7 +47,7 @@ export default function Card({ task, onDelete, type, handleEdit }) {
         >
             <div
                 className={`flex items-center mr-2 mb-2 w-full border border-w-1 rounded-lg ${typeColors[type]} duration-300`}>
-                <div className="p-4 rounded-lg text-white flex items-center hover:cursor-move w-full">
+                <div className="p-4 rounded-lg flex items-center hover:cursor-move w-full">
                     <Grip className="inline-block mr-2 text-gray-500" />
                     {isEditing ? (
                         <input
@@ -59,7 +59,7 @@ export default function Card({ task, onDelete, type, handleEdit }) {
                             ref={inputRef}
                         />
                     ) : (
-                        <span className="text-white">{task.text}</span>
+                        <span>{task.text}</span>
                     )}
                 </div>
                 <div className="flex justify-center m-2 ">

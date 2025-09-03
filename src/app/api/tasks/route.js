@@ -10,7 +10,7 @@ export async function POST(request) {
         const { tasks } = await request.json();
         const session = await getServerSession(options);
         if(!session) {
-            return NextResponse({ message: "User not logged in"}, { status: 401});
+            return NextResponse.json({ message: "User not logged in"}, { status: 401});
         }
 
         const user = await User.findOne({ email: session?.user?.email });
@@ -33,7 +33,7 @@ export async function GET() {
 
         const session = await getServerSession(options);
         if(!session) {
-            return NextResponse({ message: "User not logged in"}, { status: 401});
+            return NextResponse.json({ message: "User not logged in"}, { status: 401});
         }
 
         const user = await User.findOne({ email: session?.user?.email });

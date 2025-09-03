@@ -11,8 +11,8 @@ export default function HeaderNav() {
     const [open, setOpen] = useState(false);
 
     return (
-        <div className="text-black dark:text-white transition-colors duration-300">
-            <div className="flex items-center justify-between min-h-16 text-black dark:text-white transition-colors duration-300 mx-3">
+        <div className="transition-colors duration-300">
+            <div className="flex items-center justify-between min-h-16transition-colors duration-300 mx-3">
                 <div className="flex items-center space-x-4 cursor-pointer">
                     
                     <Image
@@ -64,7 +64,7 @@ export default function HeaderNav() {
                             </button>
                         </div>
                     )}
-                    {/* <DarkModeButton /> */}
+                    <DarkModeButton />
                 </div>
             </div >
         </div >
