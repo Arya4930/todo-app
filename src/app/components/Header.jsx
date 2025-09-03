@@ -12,7 +12,7 @@ export default function HeaderNav() {
 
     return (
         <div className="transition-colors duration-300">
-            <div className="flex items-center justify-between min-h-16transition-colors duration-300 mx-3">
+            <div className="flex items-center justify-between min-h-16 transition-colors duration-300 mx-3">
                 <div className="flex items-center space-x-4 cursor-pointer">
                     
                     <Image
@@ -29,10 +29,10 @@ export default function HeaderNav() {
 
                 <div className="flex items-center space-x-6">
                     {status === 'authenticated' && (
-                        <div key="profile" className="relative flex items-center gap-4 py-2 rounded-lg">
+                        <div className="relative flex items-center gap-4 py-2 rounded-lg">
                             <button
                                 onClick={() => setOpen(!open)}
-                                className="flex items-center px-2 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white transition hover:cursor-pointer"
+                                className="flex items-center px-2 py-2 rounded-full bg-blue-600 hover:bg-blue-700 transition hover:cursor-pointer"
                             >
                                 <div className="relative w-10 h-10 rounded-full overflow-hidden">
                                     <Image
@@ -44,7 +44,7 @@ export default function HeaderNav() {
                                 </div>
                             </button>
                             {open && (
-                                <div className="absolute right-0 mt-30 w-44 bg-slate-800 text-white rounded-lg shadow-lg z-50 py-2">
+                                <div className="absolute right-0 mt-30 w-44 bg-slate-800rounded-lg shadow-lg z-50 py-2">
                                     <button onClick={() => signOut({ callbackUrl: '/' })}
                                         className="block w-full text-left px-4 py-2 text-base hover:bg-slate-500 hover:cursor-pointer"
                                     >
