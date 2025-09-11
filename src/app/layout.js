@@ -27,13 +27,20 @@ export const metadata = {
     icon: '/favicon.ico',
     shortcut: '/favicon.ico',
     apple: '/favicon.ico'
-  }
+  },
+  manifest: "/manifest.json",
+  themeColor: "#317EFB",
 };
 
 export default function RootLayout({ children }) {
   return (
       <html lang="en" suppressHydrationWarning>
-        <head />
+        <head>
+          <meta name="apple-mobile-web-app-capable" content="yes" />
+          <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+          <meta name="apple-mobile-web-app-title" content="My App" />
+          <link rel="apple-touch-icon" href="/logo.png" />
+        </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} ${roboto.variable} antialiased`}
         >
